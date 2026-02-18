@@ -1,0 +1,68 @@
+class DragAndDrop {
+  selectors = {
+    root: "[data-js-dnd]",
+  };
+  stateClasses = {
+    isDragging: "is-dragging",
+  };
+  initialState = {
+    offsetX: null,
+    offsetY: null,
+    isDragging: false,
+    currentDraggingElement: null,
+  };
+
+  constructor() {
+    this.state = { ...this.initialState };
+    this.bindEvents();
+  }
+
+  onPointerDown(event) {
+    const isDraggable = event.target.closest(this.selectors.root);
+    if (!isDraggable) {
+      return;
+    }
+    draggableElement.classList.add(this.stateClasses.isDragging);
+
+    const { left, top } = draggableElement.getBoundingClientRect();
+
+    this.state = {
+      offsetX: event.x - left,
+      offsetY: event.y - top,
+      isDragging: true,
+      currentDraggingElement: draggableElement,
+    };
+  }
+  onPointerMove(event) {
+    if (!this.state.isDragging) {
+      return;
+    }
+
+    const x = event.pageX - this.state.offsetX;
+    const y = event.pageY - this.state.offsetY;
+
+    this.state.currentDraggingElement = `${x}px`;
+    this.state.currentDraggingElement = `${y}px`;
+  }
+  onPointerUp() {
+    if (!this.state.isDragging) {
+      return;
+    }
+
+    this.state.currentDraggingElement.classList.remove(
+      this.stateClasses.isDragging,
+    );
+    this.state = { ...this.initialState };
+  }
+
+  bindEvents() {
+    document.addEventListener("pointerdown", (event) =>
+      this.onPointerDown(event),
+    );
+    document.addEventListener("pointermove", (event) =>
+      this.onPointerMove(event),
+    );
+    document.addEventListener("pointerup", () => this.onPointerUp());
+  }
+}
+new DragAndDrop();
